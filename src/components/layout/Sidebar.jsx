@@ -1,8 +1,7 @@
-import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, FilePlus2, Files, UserCircle2, Activity, LogOut,
-  Users, Gauge, FileBarChart2, Cpu, Settings, X, Menu,
+  Users, Gauge, FileBarChart2, Cpu, Settings, X,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { initials } from '../../utils/formatters';
@@ -25,54 +24,20 @@ const ADMIN_LINKS = [
   { to: '/admin/settings', label: 'Settings', icon: Settings },
 ];
 
-export default function Sidebar({ role = 'applicant', mobileOpen = false, onCloseMobile }) {
+/**
+ * Pure presentational sidebar. Open/closed state lives in DashboardLayout
+ * so the layout can react to it (e.g. reflow content) instead of this
+ * component floating a button on top of the page.
+ */
+export default function Sidebar({ role = 'applicant', mobileOpen = false, onCloseMobile, onCollapse }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const links = role === 'admin' ? ADMIN_LINKS : APPLICANT_LINKS;
-
-  // Tracks whether the sidebar has been closed via the X button.
-  // This is separate from `mobileOpen` (which only drives the
-  // slide-in/out behavior on small screens) so the X button also
-  // works on desktop, where the sidebar is normally always visible.
-  const [collapsed, setCollapsed] = useState(false);
 
   const handleLogout = () => {
     logout();
     navigate('/');
   };
-
-  const handleClose = () => {
-    setCollapsed(true);
-    onCloseMobile?.();
-  };
-
-  if (collapsed) {
-    return (
-      <button
-        onClick={() => setCollapsed(false)}
-        aria-label="Open menu"
-        style={{
-          position: 'fixed',
-          top: 16,
-          left: 16,
-          zIndex: 200,
-          width: 40,
-          height: 40,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: 'var(--color-navy-900)',
-          color: '#fff',
-          border: 'none',
-          borderRadius: 8,
-          cursor: 'pointer',
-          boxShadow: 'var(--shadow-md)',
-        }}
-      >
-        <Menu size={18} />
-      </button>
-    );
-  }
 
   return (
     <>
@@ -83,7 +48,7 @@ export default function Sidebar({ role = 'applicant', mobileOpen = false, onClos
           <button
             className="modal-close"
             style={{ marginLeft: 'auto', color: '#fff' }}
-            onClick={handleClose}
+            onClick={() => { onCollapse?.(); onCloseMobile?.(); }}
             aria-label="Close menu"
           >
             <X size={18} />

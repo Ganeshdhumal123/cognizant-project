@@ -8,21 +8,46 @@ import Sidebar from './Sidebar';
  */
 export default function DashboardLayout({ role = 'applicant', children }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
 
   return (
     <div className="app-shell">
-      <Sidebar role={role} mobileOpen={mobileOpen} onCloseMobile={() => setMobileOpen(false)} />
-      <div className="app-main">
-        <div className="navbar" style={{ display: 'none' }} />
-        <button
-          className="navbar-toggle"
-          style={{ display: 'none' }}
-          aria-hidden="true"
+      {!collapsed && (
+        <Sidebar
+          role={role}
+          mobileOpen={mobileOpen}
+          onCloseMobile={() => setMobileOpen(false)}
+          onCollapse={() => setCollapsed(true)}
         />
+      )}
+      <div className="app-main">
         <div className="app-content">
+          {collapsed && (
+            <button
+              onClick={() => setCollapsed(false)}
+              aria-label="Open menu"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'var(--color-navy-900)',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 8,
+                width: 40,
+                height: 40,
+                marginBottom: 16,
+                cursor: 'pointer',
+                boxShadow: 'var(--shadow-md)',
+              }}
+            >
+              <Menu size={18} />
+            </button>
+          )}
           <button
             onClick={() => setMobileOpen(true)}
             aria-label="Open menu"
+            className="mobile-menu-btn"
             style={{
               display: 'none',
               background: 'var(--color-white)',
@@ -31,7 +56,6 @@ export default function DashboardLayout({ role = 'applicant', children }) {
               padding: 8,
               marginBottom: 16,
             }}
-            className="mobile-menu-btn"
           >
             <Menu size={18} />
           </button>
